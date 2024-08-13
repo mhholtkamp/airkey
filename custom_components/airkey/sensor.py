@@ -1,18 +1,19 @@
 import logging
-import requests
 from datetime import timedelta
+import requests
+
 from homeassistant.components.sensor import SensorEntity
-from homeassistant.const import CONF_API_KEY
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
-from .const import DOMAIN, SENSOR_NAME, API_URL
+
+from .const import DOMAIN, SENSOR_NAME, API_URL, CONF_API_KEY
 
 _LOGGER = logging.getLogger(__name__)
 
 SCAN_INTERVAL = timedelta(minutes=5)
 
-async def async_setup_platform(hass, config, async_add_entities, discovery_info=None):
-    """Setup the AirKey sensor platform."""
-    api_key = config[CONF_API_KEY]
+async def async_setup_entry(hass, config_entry, async_add_entities):
+    """Set up the AirKey sensor from a config entry."""
+    api_key = config_entry.data[CONF_API_KEY]
 
     coordinator = AirKeyDataUpdateCoordinator(hass, api_key)
 
@@ -64,7 +65,6 @@ class AirKeySensor(SensorEntity):
     @property
     def state(self):
         """Return the state of the sensor."""
-        # Assuming the API returns a list of events
         events = self.coordinator.data.get('events', [])
         return len(events)
 

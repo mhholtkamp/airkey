@@ -21,7 +21,6 @@ class AirkeyConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             self._api_key = user_input[CONF_API_KEY]
             self._scan_interval = user_input.get(CONF_SCAN_INTERVAL, 15)
 
-            # Validate API Key or other checks here
             return self.async_create_entry(
                 title="Airkey Integration",
                 data={

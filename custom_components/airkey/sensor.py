@@ -1,51 +1,52 @@
-from homeassistant.config_entries import ConfigEntry
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 import aiohttp
+from homeassistant.helpers.entity import Entity
+from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 from datetime import timedelta
-import logging
 
-_LOGGER = logging.getLogger(__name__)
+class AirKeySensor:
+    """Representation of an AirKey Sensor."""
 
-async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
-    """Set up AirKey from a config entry."""
-    api_key = entry.data[CONF_API_KEY]
-    scan_interval = timedelta(minutes=entry.options.get(CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL))
+    def __init__(self, hass, entry):
+        """Initialize the sensor."""
+        self._hass = hass
+        self._entry = entry
+        self._api_key = entry.data.get('api_key')
+        self._scan_interval = timedelta(minutes=entry.data.get('scan_interval', 15))
 
-    coordinator = AirKeyDataUpdateCoordinator(
-        hass, aiohttp.ClientSession(), api_key, scan_interval
-    )
-
-    await coordinator.async_config_entry_first_refresh()
-
-    hass.data[DOMAIN] = {entry.entry_id: coordinator}
-
-    await hass.config_entries.async_forward_entry_setup(entry, 'sensor')
-
-    return True
-
-class AirKeyDataUpdateCoordinator(DataUpdateCoordinator):
-    """Class to manage fetching AirKey data from API."""
-
-    def __init__(self, hass: HomeAssistant, session: aiohttp.ClientSession, api_key: str, scan_interval: timedelta):
-        """Initialize the data update coordinator."""
-        self.api_key = api_key
-        self.session = session
-        self.url = "https://integration.api.airkey.evva.com:443/cloud/v1/events?limit=100"
-        self.headers = {"X-API-Key": self.api_key}
-
-        super().__init__(
+        self._coordinator = DataUpdateCoordinator(
             hass,
             _LOGGER,
-            name=DOMAIN,
-            update_interval=scan_interval,
+            name="airkey_sensor",
+            update_method=self._async_update_data,
+            update_interval=self._scan_interval,
         )
 
+    async def async_setup(self):
+        """Set up the AirKey sensor."""
+        await self._coordinator.async_config_entry_first_refresh()
+
     async def _async_update_data(self):
-        """Fetch data from API."""
+        """Fetch data from the AirKey API."""
         try:
-            async with self.session.get(self.url, headers=self.headers) as response:
-                response.raise_for_status()
-                return await response.json()
-        except aiohttp.ClientError as err:
-            raise UpdateFailed(f"Error communicating with API: {err}")
+            async with aiohttp.ClientSession() as session:
+                headers = {'X-API-Key': self._api_key}
+                async with session.get('https://integration.api.airkey.evva.com:443/cloud/v1/events', headers=headers) as response:
+                    data = await response.json()
+                    return data
+        except Exception as e:
+            raise UpdateFailed(f"Error communicating with API: {e}")
+
+    @property
+    def name(self):
+        """Return the name of the sensor."""
+        return "AirKey Events"
+
+    @property
+    def state(self):
+        """Return the state of the sensor."""
+        return self._coordinator.data
+
+    @property
+    def available(self):
+        """Return True if the sensor is available."""
+        return self._coordinator.last_update_success

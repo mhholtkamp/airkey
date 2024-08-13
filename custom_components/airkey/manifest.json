@@ -2,7 +2,6 @@
   "domain": "airkey",
   "name": "Evva Airkey (custom)",
   "version": "1.0.0",
-  "documentation": "https://github.com/reiniertc/airkey",
   "dependencies": [],
   "requirements": [
     "requests"

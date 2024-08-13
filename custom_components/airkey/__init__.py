@@ -1,10 +1,13 @@
 import logging
 from datetime import timedelta
+import voluptuous as vol
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_API_KEY, CONF_SCAN_INTERVAL
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers import config_entry_flow
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
+import homeassistant.helpers.config_validation as cv
 
 from .const import DOMAIN
 
@@ -23,7 +26,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
 
     hass.data[DOMAIN] = {"coordinator": coordinator}
 
-    # Set up sensors here if needed
+    # Forward setup of the platform to the sensor setup
+    await hass.config_entries.async_forward_entry_setup(entry, "sensor")
 
     return True
 
@@ -43,16 +47,29 @@ class AirkeyDataUpdateCoordinator(DataUpdateCoordinator):
     async def _async_update_data(self):
         """Fetch data from the Airkey API."""
         try:
-            async with self.hass.async_add_executor_job(self._fetch_data) as response:
-                return response
+            import requests
+            url = "https://api.evva.com/airkey/events"
+            headers = {"X-API-Key": self.api_key}
+            response = requests.get(url, headers=headers)
+            response.raise_for_status()
+            return response.json()
         except Exception as e:
             raise UpdateFailed(f"Error communicating with API: {e}")
 
-    def _fetch_data(self):
-        import requests
+# Define the configuration schema
+async def async_setup(hass: HomeAssistant, config: dict):
+    """Set up the Airkey component."""
+    return True
 
-        url = "https://integration.api.airkey.evva.com:443/cloud/v1/events"
-        headers = {"X-API-Key": self.api_key}
-        response = requests.get(url, headers=headers)
-        response.raise_for_status()
-        return response.json()
+async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry):
+    """Unload an integration config entry."""
+    await hass.config_entries.async_forward_entry_unload(entry, "sensor")
+    return True
+
+# Define configuration schema for the integration
+CONFIG_SCHEMA = vol.Schema({
+    DOMAIN: vol.Schema({
+        vol.Required(CONF_API_KEY): cv.string,
+        vol.Optional(CONF_SCAN_INTERVAL, default=15): cv.positive_int,
+    })
+}, extra=vol.ALLOW_EXTRA)

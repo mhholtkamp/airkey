@@ -1,0 +1,9 @@
+{
+  "domain": "airkey",
+  "name": "EVVA AirKey",
+  "documentation": "https://www.example.com",
+  "requirements": [],
+  "dependencies": [],
+  "codeowners": [],
+  "version": "0.1"
+}

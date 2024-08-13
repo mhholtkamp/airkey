@@ -1,4 +1,3 @@
-"""Constants for the Airkey integration."""
-
 DOMAIN = "airkey"
-DEFAULT_SCAN_INTERVAL = 15
+CONF_API_KEY = "api_key"
+CONF_SCAN_INTERVAL = "scan_interval"

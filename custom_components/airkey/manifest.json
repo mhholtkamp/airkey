@@ -2,9 +2,9 @@
   "domain": "airkey",
   "name": "EVVA AirKey (custom)",
   "documentation": "https://github.com/reiniertc/airkey/blob/main/README.md",
-  "requirements": [],
+  "requirements": ["aiohttp"],
   "dependencies": [],
-  "codeowners": [],
-  "version": "0.1",
+  "codeowners": ["@reiniertc"],
+  "version": "0.2",
   "config_flow": true
 }

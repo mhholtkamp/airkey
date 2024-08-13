@@ -9,7 +9,7 @@ This custom component integrates Evva Airkey API with Home Assistant. It allows 
 1. **Add the custom repository to HACS:**
    - Go to HACS in your Home Assistant UI.
    - Click on "Custom repositories" under "Integrations".
-   - Add the repository URL: `https://github.com/yourusername/airkey`.
+   - Add the repository URL: `https://github.com/reiniertc/airkey`.
    - Choose "Integration" as the category and click "Add".
 
 2. **Install the custom component:**

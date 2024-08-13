@@ -36,6 +36,6 @@ class AirKeyConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             step_id="user",
             data_schema=data_schema,
             errors=errors,
-            description_placeholders="Enter your API Key",
+            description_placeholders=none,
             title="Evva Airkey API-key",  # This is where you set the title
         )

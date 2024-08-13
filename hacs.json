@@ -7,7 +7,6 @@
     "@reiniertc"
   ],
   "homeassistant": "2023.1.0",
-  "documentation": "https://github.com/reiniertc/airkey",
   "requirements": [
     "requests"
   ]

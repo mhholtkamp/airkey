@@ -1,8 +1,10 @@
 import voluptuous as vol
 from homeassistant import config_entries
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers import config_validation as cv
-from .const import DOMAIN, CONF_API_KEY, CONF_SCAN_INTERVAL
+
+DOMAIN = "airkey"
+CONF_API_KEY = "api_key"
+CONF_SCAN_INTERVAL = "scan_interval"
 
 DEFAULT_SCAN_INTERVAL = 15
 
@@ -20,17 +22,13 @@ class AirKeyConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             api_key = user_input.get(CONF_API_KEY)
             scan_interval = user_input.get(CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL)
 
-            try:
-                return self.async_create_entry(
-                    title="Evva Airkey",
-                    data={
-                        CONF_API_KEY: api_key,
-                        CONF_SCAN_INTERVAL: scan_interval,
-                    }
-                )
-            except Exception as e:
-                _LOGGER.error(f"API Key validation failed: {e}")
-                errors["base"] = "api_key_error"
+            return self.async_create_entry(
+                title="Evva Airkey",
+                data={
+                    CONF_API_KEY: api_key,
+                    CONF_SCAN_INTERVAL: scan_interval,
+                }
+            )
 
         data_schema = vol.Schema({
             vol.Required(CONF_API_KEY): str,

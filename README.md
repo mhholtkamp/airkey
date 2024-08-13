@@ -7,13 +7,10 @@ This integration allows you to connect EVVA AirKey with Home Assistant to monito
 1. Add this repository to HACS as a custom repository.
 2. Search for "EVVA AirKey" in the HACS store.
 3. Install the integration.
-4. Add the following to your `configuration.yaml`:
+4. Go to the integrarion page and add the integration "evva airkey (custom)
+5. Add the api-key to the configuration
 
-```yaml
-sensor:
-  - platform: airkey
-    api_key: YOUR_API_KEY
-```
+** important: there is no check if the api-key is valid **
 
 ## Disclaimer
 This integration is build for hobby purposes and is not affiliated with Evva

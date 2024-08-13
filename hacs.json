@@ -1,0 +1,9 @@
+{
+  "name": "EVVA AirKey",
+  "content_in_root": false,
+  "domains": ["sensor"],
+  "country": "nl",
+  "iot_class": "Cloud Polling",
+  "homeassistant": "0.96.0",
+  "render_readme": true
+}

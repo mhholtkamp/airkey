@@ -14,3 +14,6 @@ sensor:
   - platform: airkey
     api_key: YOUR_API_KEY
 ```
+
+## Disclaimer
+This integration is build for hobby purposes and is not affiliated with Evva

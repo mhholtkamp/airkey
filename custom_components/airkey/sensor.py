@@ -1,6 +1,8 @@
 import logging
 from datetime import timedelta
-import requests
+
+import aiohttp
+import async_timeout
 
 from homeassistant.components.sensor import SensorEntity
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
@@ -38,16 +40,18 @@ class AirKeyDataUpdateCoordinator(DataUpdateCoordinator):
     async def _async_update_data(self):
         """Fetch data from AirKey API."""
         headers = {"X-API-Key": self.api_key}
-        try:
-            response = requests.get(API_URL, headers=headers)
-            response.raise_for_status()
-            return response.json()
-        except requests.exceptions.HTTPError as http_err:
-            _LOGGER.error(f"HTTP error occurred: {http_err}")
-            raise UpdateFailed(f"HTTP error: {http_err}")
-        except Exception as err:
-            _LOGGER.error(f"Error fetching data: {err}")
-            raise UpdateFailed(f"Error fetching data: {err}")
+
+        async with aiohttp.ClientSession() as session:
+            try:
+                with async_timeout.timeout(10):
+                    async with session.get(API_URL, headers=headers) as response:
+                        if response.status != 200:
+                            raise UpdateFailed(f"Unexpected status code: {response.status}")
+                        return await response.json()
+
+            except aiohttp.ClientError as err:
+                _LOGGER.error(f"Error fetching data: {err}")
+                raise UpdateFailed(f"Error fetching data: {err}")
 
 
 class AirKeySensor(SensorEntity):

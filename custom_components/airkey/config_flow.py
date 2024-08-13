@@ -1,45 +1,46 @@
+"""Config flow for the Airkey integration."""
+
+from typing import Any, Dict
 import voluptuous as vol
 from homeassistant import config_entries
-from homeassistant.core import HomeAssistant
+from homeassistant.const import CONF_API_KEY, CONF_SCAN_INTERVAL
+from .const import DOMAIN
 
-DOMAIN = "airkey"
-CONF_API_KEY = "api_key"
-CONF_SCAN_INTERVAL = "scan_interval"
-
-DEFAULT_SCAN_INTERVAL = 15
-
-@config_entries.HANDLERS.register(DOMAIN)
-class AirKeyConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
-    """Handle a config flow for AirKey."""
+class AirkeyConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
+    """Handle a config flow for Airkey."""
 
     VERSION = 1
+    CONNECTION_CLASS = config_entries.CONN_CLASS_CLOUD_POLL
 
-    async def async_step_user(self, user_input=None):
+    def __init__(self):
+        """Initialize."""
+        self.api_key = None
+        self.scan_interval = None
+
+    async def async_step_user(self, user_input: Dict[str, Any] = None):
         """Handle the initial step."""
-        errors = {}
-
         if user_input is not None:
-            api_key = user_input.get(CONF_API_KEY)
-            scan_interval = user_input.get(CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL)
-
+            self.api_key = user_input[CONF_API_KEY]
+            self.scan_interval = user_input.get(CONF_SCAN_INTERVAL, 15)
             return self.async_create_entry(
-                title="Evva Airkey",
+                title="Airkey",
                 data={
-                    CONF_API_KEY: api_key,
-                    CONF_SCAN_INTERVAL: scan_interval,
-                }
+                    CONF_API_KEY: self.api_key,
+                },
+                options={
+                    CONF_SCAN_INTERVAL: self.scan_interval,
+                },
             )
-
-        data_schema = vol.Schema({
-            vol.Required(CONF_API_KEY): str,
-            vol.Optional(CONF_SCAN_INTERVAL, default=DEFAULT_SCAN_INTERVAL): vol.All(
-                vol.Coerce(int), vol.Range(min=1)
-            ),
-        })
-
         return self.async_show_form(
             step_id="user",
-            data_schema=data_schema,
-            errors=errors,
-            title="Evva Airkey API Key",
+            data_schema=self._get_schema(),
+        )
+
+    def _get_schema(self):
+        """Return the schema for user input."""
+        return vol.Schema(
+            {
+                vol.Required(CONF_API_KEY): str,
+                vol.Optional(CONF_SCAN_INTERVAL, default=15): int,
+            }
         )

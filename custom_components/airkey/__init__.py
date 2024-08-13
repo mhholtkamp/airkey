@@ -1,6 +1,5 @@
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
-from .sensor import AirKeyDataUpdateCoordinator, async_setup_entry
 
 async def async_setup(hass: HomeAssistant, config: dict) -> bool:
     """Set up the AirKey component."""

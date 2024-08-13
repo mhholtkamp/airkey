@@ -1,16 +1,20 @@
-# EVVA AirKey Home Assistant Integration
+# AirKey Integration for Home Assistant
 
-This integration allows you to connect EVVA AirKey with Home Assistant to monitor events.
+This custom component integrates the EVVA AirKey read only API-data with Home Assistant.
 
-## Installation via HACS
+## Installation
 
-1. Add this repository to HACS as a custom repository.
-2. Search for "EVVA AirKey" in the HACS store.
-3. Install the integration.
-4. Go to the integrarion page and add the integration "evva airkey (custom)
-5. Add the api-key to the configuration
+1. Install this integration using HACS.
+2. Add the integration to Home Assistant and provide your API key.
 
-* important: there is no check if the api-key is valid *
+## Configuration
+
+- **API Key**: Your EVVA AirKey API key.
+- **Scan Interval**: Interval in minutes for data updates (default is 15 minutes).
+
+## Troubleshooting
+
+If you encounter issues, check the logs and ensure that the API key is correct.
 
 ## Disclaimer
 This integration is build for hobby purposes and is not affiliated with Evva

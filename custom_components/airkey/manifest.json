@@ -1,9 +1,10 @@
 {
   "domain": "airkey",
-  "name": "EVVA AirKey",
+  "name": "EVVA AirKey (custom)",
   "documentation": "https://www.example.com",
   "requirements": [],
   "dependencies": [],
   "codeowners": [],
-  "version": "0.1"
+  "version": "0.1",
+  "config_flow": true
 }

@@ -1,13 +1,10 @@
 import logging
 from datetime import timedelta
-import voluptuous as vol
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_API_KEY, CONF_SCAN_INTERVAL
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers import config_entry_flow
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
-import homeassistant.helpers.config_validation as cv
 
 from .const import DOMAIN
 
@@ -55,21 +52,3 @@ class AirkeyDataUpdateCoordinator(DataUpdateCoordinator):
             return response.json()
         except Exception as e:
             raise UpdateFailed(f"Error communicating with API: {e}")
-
-# Define the configuration schema
-async def async_setup(hass: HomeAssistant, config: dict):
-    """Set up the Airkey component."""
-    return True
-
-async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry):
-    """Unload an integration config entry."""
-    await hass.config_entries.async_forward_entry_unload(entry, "sensor")
-    return True
-
-# Define configuration schema for the integration
-CONFIG_SCHEMA = vol.Schema({
-    DOMAIN: vol.Schema({
-        vol.Required(CONF_API_KEY): cv.string,
-        vol.Optional(CONF_SCAN_INTERVAL, default=15): cv.positive_int,
-    })
-}, extra=vol.ALLOW_EXTRA)

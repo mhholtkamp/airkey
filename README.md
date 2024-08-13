@@ -1,40 +1,31 @@
-# Airkey Integration for Home Assistant
+# Evva Airkey (custom) Integration for Home Assistant
 
-This is a custom integration for Home Assistant that connects to the Airkey API to provide status updates for your Airkey locks.
+## Overview
+
+This custom component integrates Evva Airkey API with Home Assistant. It allows you to monitor the status of your Airkey locks and users.
 
 ## Installation
 
-1. **Via HACS**:
-   - Go to HACS in your Home Assistant.
-   - Click on "Frontend" or "Integrations".
-   - Search for "Airkey".
-   - Install the repository.
+1. **Add the custom repository to HACS:**
+   - Go to HACS in your Home Assistant UI.
+   - Click on "Custom repositories" under "Integrations".
+   - Add the repository URL: `https://github.com/yourusername/airkey`.
+   - Choose "Integration" as the category and click "Add".
 
-2. **Manual Installation**:
-   - Download the repository as a ZIP file.
-   - Extract it and place the `airkey` folder in your Home Assistant `custom_components` directory.
+2. **Install the custom component:**
+   - Go to HACS > Integrations.
+   - Search for "Evva Airkey (custom)" and install it.
 
 ## Configuration
 
-Once installed, add the integration via the Home Assistant UI:
+1. **Add the integration:**
+   - Go to Configuration > Integrations in Home Assistant.
+   - Click the "+" button and search for "Evva Airkey (custom)".
+   - Enter your API key and configure the update interval (default is 15 minutes).
 
-1. Go to Configuration > Integrations.
-2. Click on "Add Integration" and search for "Airkey".
-3. Enter your API key and configure the update interval.
-
-### Configuration Options
-
-- **API Key**: Your Airkey API key.
-- **Update Interval**: How often, in minutes, Home Assistant should poll the API for updates. Default is 15 minutes.
-
-## Usage
-
-After setup, the integration will create a sensor entity in Home Assistant that provides the current status of your Airkey locks. You can view and use this sensor in your automations and dashboards.
-
-## Developer Information
-
-If you wish to contribute to the development of this integration or if you have any issues, please visit the [GitHub repository](https://github.com/yourusername/airkey).
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+2. **Configure via YAML (optional):**
+   You can also configure it using YAML if preferred:
+   ```yaml
+   airkey:
+     api_key: YOUR_API_KEY
+     scan_interval: 15

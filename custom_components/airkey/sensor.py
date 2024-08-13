@@ -20,7 +20,10 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
     coordinator = AirKeyDataUpdateCoordinator(hass, api_key)
 
     await coordinator.async_config_entry_first_refresh()
-
+    
+    # Voeg debug logging toe
+    _LOGGER.debug("Adding AirKey sensor entity")
+    
     async_add_entities([AirKeySensor(coordinator)], True)
 
 
@@ -47,11 +50,14 @@ class AirKeyDataUpdateCoordinator(DataUpdateCoordinator):
                     async with session.get(API_URL, headers=headers) as response:
                         if response.status != 200:
                             raise UpdateFailed(f"Unexpected status code: {response.status}")
-                        return await response.json()
+                        data = await response.json()
+                        _LOGGER.debug("Fetched data: %s", data)
+                        return data
 
             except aiohttp.ClientError as err:
                 _LOGGER.error(f"Error fetching data: {err}")
                 raise UpdateFailed(f"Error fetching data: {err}")
+
 
 
 class AirKeySensor(SensorEntity):
@@ -60,6 +66,7 @@ class AirKeySensor(SensorEntity):
     def __init__(self, coordinator):
         """Initialize the sensor."""
         self.coordinator = coordinator
+        self._attr_unique_id = "airkey_events"
 
     @property
     def name(self):
@@ -82,3 +89,4 @@ class AirKeySensor(SensorEntity):
     async def async_update(self):
         """Update the sensor state."""
         await self.coordinator.async_request_refresh()
+

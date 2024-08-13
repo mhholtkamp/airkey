@@ -1,46 +1,52 @@
 import voluptuous as vol
 from homeassistant import config_entries
-from homeassistant.core import callback
+from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryNotReady
+from homeassistant.helpers import config_validation as cv
+from .const import DOMAIN, CONF_API_KEY, CONF_SCAN_INTERVAL
 
-from .const import DOMAIN, CONF_API_KEY
+# Default scan interval in minutes
+DEFAULT_SCAN_INTERVAL = 15
 
 @config_entries.HANDLERS.register(DOMAIN)
 class AirKeyConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     """Handle a config flow for AirKey."""
 
     VERSION = 1
-    CONNECTION_CLASS = config_entries.CONN_CLASS_CLOUD_POLL
 
     async def async_step_user(self, user_input=None):
         """Handle the initial step."""
         errors = {}
 
         if user_input is not None:
-            # Validate the API key or perform any setup checks here
             api_key = user_input.get(CONF_API_KEY)
+            scan_interval = user_input.get(CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL)
 
-            # Example validation check
-            if not api_key:
-                errors["base"] = "invalid_api_key"
-            else:
-                # Perform a test with the API key
-                try:
-                    # Add your API key validation logic here
-                    return self.async_create_entry(title="Evva Airkey", data=user_input)
-                except Exception as e:
-                    # Log exception and show error
-                    _LOGGER.error(f"API Key validation failed: {e}")
-                    errors["base"] = "api_key_error"
+            # Validate API key and scan interval here
+            try:
+                # Example API call to validate the API key
+                # Replace with your actual API call and validation logic
+                return self.async_create_entry(
+                    title="Evva Airkey",
+                    data={
+                        CONF_API_KEY: api_key,
+                        CONF_SCAN_INTERVAL: scan_interval,
+                    }
+                )
+            except Exception as e:
+                _LOGGER.error(f"API Key validation failed: {e}")
+                errors["base"] = "api_key_error"
 
-        # Define the schema for the form
         data_schema = vol.Schema({
-            vol.Required(CONF_API_KEY): str
+            vol.Required(CONF_API_KEY): str,
+            vol.Optional(CONF_SCAN_INTERVAL, default=DEFAULT_SCAN_INTERVAL): vol.All(
+                vol.Coerce(int), vol.Range(min=1)
+            ),
         })
 
         return self.async_show_form(
             step_id="user",
             data_schema=data_schema,
             errors=errors,
-            title="Evva Airkey API-key",  # Title to show on the form
+            title="Evva Airkey API Key",
         )

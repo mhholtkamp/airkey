@@ -1,9 +1,10 @@
 {
-  "name": "EVVA AirKey (custom)",
-  "content_in_root": false,
-  "domains": ["sensor"],
-  "country": "nl",
-  "iot_class": "Cloud Polling",
-  "homeassistant": "0.96.0",
-  "render_readme": true
+  "name": "Evva Airkey (custom)",
+  "description": "A Home Assistant-integratie for retrieving information on your Evva Airkey-locks.",
+  "image": "https://github.com/reiniertc/airkey/logo.png",  // URL naar een afbeelding van je keuze
+  "documentation": "https://github.com/reiniertc/airkey/README.md",
+  "repository": "https://github.com/reiniertc/airkey/",
+  "keywords": ["lock", "evva", "airkey"],
+  "dependencies": [],
+  "codeowners": ["@reiniertc"]
 }

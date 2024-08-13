@@ -1,7 +1,7 @@
 {
   "domain": "airkey",
   "name": "EVVA AirKey (custom)",
-  "documentation": "https://www.example.com",
+  "documentation": "https://github.com/reiniertc/airkey/blob/main/README.md",
   "requirements": [],
   "dependencies": [],
   "codeowners": [],

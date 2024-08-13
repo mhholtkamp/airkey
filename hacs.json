@@ -2,7 +2,7 @@
   "name": "Evva Airkey (custom)",
   "description": "A Home Assistant-integratie for retrieving information on your Evva Airkey-locks.",
   "image": "https://github.com/reiniertc/airkey/blob/main/logo.png",  
-  "documentation": "https://github.com/reiniertc/airkey/blob/main/README.md",
+  "documentation": "https://github.com/reiniertc/airkey/raw/main/README.md",
   "repository": "https://github.com/reiniertc/airkey/",
   "keywords": ["lock", "evva", "airkey"],
   "dependencies": [],

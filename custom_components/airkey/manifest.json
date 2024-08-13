@@ -1,9 +1,11 @@
 {
   "domain": "airkey",
   "name": "Evva Airkey (custom)",
-  "documentation": "https://github.com/yourusername/airkey",
-  "requirements": ["aiohttp"],
+  "version": "1.0.0",
+  "documentation": "https://github.com/reiniertc/airkey",
   "dependencies": [],
-  "codeowners": ["@reiniertc"],
-  "version": "1.0.0"
+  "requirements": [
+    "requests"
+  ],
+  "codeowners": ["@reiniertc"]
 }

@@ -51,7 +51,7 @@ class AirkeyDataUpdateCoordinator(DataUpdateCoordinator):
     def _fetch_data(self):
         import requests
 
-        url = "https://api.evva.com/airkey/events"
+        url = "https://integration.api.airkey.evva.com:443/cloud/v1/events"
         headers = {"X-API-Key": self.api_key}
         response = requests.get(url, headers=headers)
         response.raise_for_status()

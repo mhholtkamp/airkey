@@ -1,38 +1,3 @@
-import logging
-import aiohttp
-from homeassistant.components.sensor import SensorEntity
-from homeassistant.const import CONF_API_KEY, CONF_SCAN_INTERVAL
-from .const import DOMAIN
-
-_LOGGER = logging.getLogger(__name__)
-
-SENSOR_TYPES = {
-    "events": "Events",
-    "credits": "Credits",
-    "areas": "Areas",
-    "maintenance_tasks": "Maintenance Tasks",
-    "media": "Media",
-    "persons": "Persons",
-    "blacklists": "Blacklists",
-    "authorizations": "Authorizations",
-    "locks": "Locks",
-}
-
-async def async_setup_entry(hass, config_entry, async_add_entities):
-    """Set up the Evva Airkey sensors from a config entry."""
-    _LOGGER.debug("Setting up Evva Airkey sensors.")
-    
-    api_key = config_entry.data[CONF_API_KEY]
-    scan_interval = config_entry.options.get(CONF_SCAN_INTERVAL, 15)
-
-    entities = []
-    for sensor_type in SENSOR_TYPES:
-        _LOGGER.debug(f"Creating sensor for {sensor_type}")
-        entities.append(AirkeySensor(sensor_type, api_key, scan_interval))
-
-    _LOGGER.debug(f"Adding {len(entities)} sensors.")
-    async_add_entities(entities, True)
-
 class AirkeySensor(SensorEntity):
     """Representation of an Evva Airkey sensor."""
 
@@ -64,15 +29,17 @@ class AirkeySensor(SensorEntity):
         """Fetch new state data for the sensor."""
         _LOGGER.debug(f"Updating Airkey sensor: {self._name}")
 
-        # Maak de API-call afhankelijk van het type sensor
-        if self._type == "events":
-            self._state, self._attributes = await self.fetch_data("https://api.airkey.evva.com:443/cloud/v1/events?createdAfter=2024-08-01T09:15:10.295Z&limit=1000")
-        elif self._type == "credits":
-            self._state, self._attributes = await self.fetch_data("https://api.airkey.evva.com:443/cloud/v1/credits")
-        # Voeg hier andere sensors toe
+        data, attributes = await self.fetch_data()
 
-    async def fetch_data(self, url):
+        # Hier plaatsen we een korte waarde in de state, zoals de lengte van de events
+        if data:
+            self._state = len(data) if isinstance(data, list) else "OK"
+            self._attributes = attributes
+
+    async def fetch_data(self):
         """Helper function to perform the API request."""
+        url = self._get_api_url()
+
         headers = {
             "X-API-Key": self._api_key,
         }
@@ -82,8 +49,20 @@ class AirkeySensor(SensorEntity):
                 if response.status == 200:
                     data = await response.json()
                     _LOGGER.debug(f"Fetched data for {self._name}: {data}")
-                    # Pas hier aan om de juiste data uit de JSON te halen
-                    return data, {}
+
+                    # Hier plaatsen we de data in attributes in plaats van direct in state
+                    attributes = {"raw_data": data}
+                    return data, attributes
                 else:
                     _LOGGER.error(f"Error fetching data from {url}, status: {response.status}")
                     return None, {}
+
+    def _get_api_url(self):
+        """Construct the correct API URL based on the sensor type."""
+        base_url = "https://api.airkey.evva.com:443/cloud/v1/"
+        endpoints = {
+            "events": f"{base_url}events?createdAfter=2024-08-01T09:15:10.295Z&limit=1000",
+            "credits": f"{base_url}credits",
+            # Voeg hier de andere endpoints toe
+        }
+        return endpoints.get(self._type, base_url)

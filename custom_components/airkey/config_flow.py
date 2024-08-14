@@ -9,37 +9,39 @@ class AirkeyConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
     VERSION = 1
 
+    async def async_step_user(self, user_input=None):
+        """Handle the initial step."""
+        errors = {}
+
+        if user_input is not None:
+            # Hier zou je eventueel validatie van de API-key kunnen uitvoeren
+            return self.async_create_entry(title="Evva Airkey", data=user_input)
+
+        data_schema = vol.Schema({
+            vol.Required(CONF_API_KEY): str,
+            vol.Optional(CONF_SCAN_INTERVAL, default=DEFAULT_REFRESH_RATE): int,
+        })
+
+        return self.async_show_form(
+            step_id="user",
+            data_schema=data_schema,
+            errors=errors,
+            description_placeholders={
+                "api_key_desc": "Enter your Evva API key",
+                "scan_interval_desc": "Set the refresh interval in minutes (default: 15)",
+            }
+        )
+
     @staticmethod
     @callback
     def async_get_options_flow(config_entry):
         return AirkeyOptionsFlowHandler(config_entry)
 
-    async def async_step_user(self, user_input=None):
-        """Handle the initial step."""
-        errors = {}
-        if user_input is not None:
-            try:
-                # Validatie van de API-key zou hier kunnen plaatsvinden
-                return self.async_create_entry(title="Evva Airkey", data=user_input)
-            except Exception:
-                errors["base"] = "cannot_connect"
-
-        data_schema = vol.Schema({
-            vol.Required(CONF_API_KEY, description="Enter your Evva API key"): str,
-            vol.Optional(
-                CONF_SCAN_INTERVAL,
-                default=DEFAULT_REFRESH_RATE,
-                description="Set the refresh interval in minutes"
-            ): vol.All(vol.Coerce(int), vol.Range(min=1)),
-        })
-
-        return self.async_show_form(step_id="user", data_schema=data_schema, errors=errors)
 
 class AirkeyOptionsFlowHandler(config_entries.OptionsFlow):
-    """Handle options flow for Airkey."""
+    """Handle an options flow for Evva Airkey."""
 
     def __init__(self, config_entry):
-        """Initialize options flow."""
         self.config_entry = config_entry
 
     async def async_step_init(self, user_input=None):
@@ -52,11 +54,13 @@ class AirkeyOptionsFlowHandler(config_entries.OptionsFlow):
             return self.async_create_entry(title="", data=user_input)
 
         options_schema = vol.Schema({
-            vol.Optional(
-                CONF_SCAN_INTERVAL,
-                default=self.config_entry.options.get(CONF_SCAN_INTERVAL, DEFAULT_REFRESH_RATE),
-                description="Set the refresh interval in minutes"
-            ): vol.All(vol.Coerce(int), vol.Range(min=1)),
+            vol.Optional(CONF_SCAN_INTERVAL, default=self.config_entry.options.get(CONF_SCAN_INTERVAL, DEFAULT_REFRESH_RATE)): int,
         })
 
-        return self.async_show_form(step_id="user", data_schema=options_schema)
+        return self.async_show_form(
+            step_id="user",
+            data_schema=options_schema,
+            description_placeholders={
+                "scan_interval_desc": "Set the refresh interval in minutes (default: 15)",
+            }
+        )

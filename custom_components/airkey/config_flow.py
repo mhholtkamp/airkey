@@ -19,14 +19,18 @@ class AirkeyConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         errors = {}
         if user_input is not None:
             try:
-                # Hier kun je een test doen met de API key om te verifiëren dat hij werkt
+                # Validatie van de API-key zou hier kunnen plaatsvinden
                 return self.async_create_entry(title="Evva Airkey", data=user_input)
             except Exception:
                 errors["base"] = "cannot_connect"
 
         data_schema = vol.Schema({
-            vol.Required(CONF_API_KEY): str,
-            vol.Optional(CONF_SCAN_INTERVAL, default=DEFAULT_REFRESH_RATE): int,
+            vol.Required(CONF_API_KEY, description="Enter your Evva API key"): str,
+            vol.Optional(
+                CONF_SCAN_INTERVAL,
+                default=DEFAULT_REFRESH_RATE,
+                description="Set the refresh interval in minutes"
+            ): vol.All(vol.Coerce(int), vol.Range(min=1)),
         })
 
         return self.async_show_form(step_id="user", data_schema=data_schema, errors=errors)
@@ -48,7 +52,11 @@ class AirkeyOptionsFlowHandler(config_entries.OptionsFlow):
             return self.async_create_entry(title="", data=user_input)
 
         options_schema = vol.Schema({
-            vol.Optional(CONF_SCAN_INTERVAL, default=self.config_entry.options.get(CONF_SCAN_INTERVAL, DEFAULT_REFRESH_RATE)): int,
+            vol.Optional(
+                CONF_SCAN_INTERVAL,
+                default=self.config_entry.options.get(CONF_SCAN_INTERVAL, DEFAULT_REFRESH_RATE),
+                description="Set the refresh interval in minutes"
+            ): vol.All(vol.Coerce(int), vol.Range(min=1)),
         })
 
         return self.async_show_form(step_id="user", data_schema=options_schema)

@@ -1,4 +1,5 @@
 import logging
+import aiohttp
 from homeassistant.components.sensor import SensorEntity
 from homeassistant.const import CONF_API_KEY, CONF_SCAN_INTERVAL
 from .const import DOMAIN
@@ -19,13 +20,17 @@ SENSOR_TYPES = {
 
 async def async_setup_entry(hass, config_entry, async_add_entities):
     """Set up the Evva Airkey sensors from a config entry."""
+    _LOGGER.debug("Setting up Evva Airkey sensors.")
+    
     api_key = config_entry.data[CONF_API_KEY]
     scan_interval = config_entry.options.get(CONF_SCAN_INTERVAL, 15)
 
     entities = []
     for sensor_type in SENSOR_TYPES:
+        _LOGGER.debug(f"Creating sensor for {sensor_type}")
         entities.append(AirkeySensor(sensor_type, api_key, scan_interval))
 
+    _LOGGER.debug(f"Adding {len(entities)} sensors.")
     async_add_entities(entities, True)
 
 class AirkeySensor(SensorEntity):
@@ -59,13 +64,12 @@ class AirkeySensor(SensorEntity):
         """Fetch new state data for the sensor."""
         _LOGGER.debug(f"Updating Airkey sensor: {self._name}")
 
-        # Hier maak je de API-call aan, afhankelijk van het type sensor
+        # Maak de API-call afhankelijk van het type sensor
         if self._type == "events":
-            # Voorbeeld API-call voor events, gebruik aiohttp voor async requests
             self._state, self._attributes = await self.fetch_data("https://api.airkey.evva.com:443/cloud/v1/events?createdAfter=2024-08-01T09:15:10.295Z&limit=1000")
         elif self._type == "credits":
             self._state, self._attributes = await self.fetch_data("https://api.airkey.evva.com:443/cloud/v1/credits")
-        # Voeg hier de andere sensors toe
+        # Voeg hier andere sensors toe
 
     async def fetch_data(self, url):
         """Helper function to perform the API request."""
@@ -77,6 +81,7 @@ class AirkeySensor(SensorEntity):
             async with session.get(url, headers=headers) as response:
                 if response.status == 200:
                     data = await response.json()
+                    _LOGGER.debug(f"Fetched data for {self._name}: {data}")
                     # Pas hier aan om de juiste data uit de JSON te halen
                     return data, {}
                 else:
